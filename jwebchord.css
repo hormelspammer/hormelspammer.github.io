@@ -1,0 +1,185 @@
+/* ── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── App shell ─────────────────────────────────────────── */
+html, body { height: 100%; font-family: "Times New Roman", Times, serif; background: #f5f3ee; color: #111; }
+body { display: flex; flex-direction: column; }
+
+/* ── Menu bar ──────────────────────────────────────────── */
+#menubar {
+  display: flex; align-items: stretch;
+  background: #e8e4dc; border-bottom: 1px solid #b0a898;
+  user-select: none; position: relative; z-index: 100;
+}
+.menu-item { position: relative; }
+.menu-title {
+  padding: 5px 14px; font-size: 13px; cursor: pointer;
+  border-right: 1px solid #c8c0b4;
+  display: flex; align-items: center; gap: 4px;
+}
+.menu-title:hover, .menu-title.open { background: #d0c8bc; }
+.menu-dropdown {
+  display: none; position: absolute; top: 100%; left: 0;
+  background: #f0ece4; border: 1px solid #b0a898;
+  min-width: 240px; box-shadow: 2px 3px 8px rgba(0,0,0,.18);
+  z-index: 200;
+}
+.menu-dropdown.visible { display: block; }
+.menu-entry {
+  padding: 7px 18px; font-size: 13px; cursor: pointer;
+  white-space: nowrap;
+}
+.menu-entry:hover { background: #4a90d9; color: #fff; }
+.menu-sep { border: none; border-top: 1px solid #c8c0b4; margin: 3px 0; }
+.menu-brand {
+  padding: 5px 16px 5px 10px; font-size: 13px; font-weight: bold;
+  color: #5a3e00; letter-spacing: .3px; display: flex; align-items: center; gap: 6px;
+}
+
+/* ── Toolbar strip ─────────────────────────────────────── */
+#toolbar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: #ede9e0; border-bottom: 1px solid #c8c0b4;
+  padding: 5px 10px;
+}
+.tb-label { font-size: 12px; color: #555; }
+.tb-btn {
+  font-size: 12px; padding: 3px 10px; cursor: pointer;
+  background: #f0ece4; border: 1px solid #a09880;
+  border-radius: 3px; font-family: "Times New Roman", serif;
+}
+.tb-btn:hover { background: #d8d0c4; }
+.tb-btn.active { background: #c8d8f0; border-color: #4a7ab0; }
+.tb-sep { width: 1px; height: 20px; background: #c8c0b4; margin: 0 2px; }
+#transpose-display {
+  font-size: 12px; font-weight: bold; color: #333;
+  background: #fff; border: 1px solid #b0a898; border-radius: 3px;
+  padding: 2px 8px; min-width: 80px; text-align: center;
+}
+
+/* ── Main layout ───────────────────────────────────────── */
+#main { display: flex; flex: 1; min-height: 0; }
+
+/* ── Editor pane ───────────────────────────────────────── */
+#editor-pane {
+  width: 340px; min-width: 220px; max-width: 520px;
+  display: flex; flex-direction: column;
+  background: #faf8f3; border-right: 1px solid #c8c0b4;
+}
+#editor-pane-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 10px; font-size: 11px; color: #888;
+  background: #edeae2; border-bottom: 1px solid #c8c0b4;
+  letter-spacing: .05em; text-transform: uppercase;
+}
+#editor-pane-header label { cursor: pointer; color: #4a7ab0; font-size: 11px; }
+#editor-pane-header label:hover { text-decoration: underline; }
+#source-editor {
+  flex: 1; width: 100%; border: none; outline: none; resize: none;
+  font-family: "Courier New", Courier, monospace; font-size: 12px; line-height: 1.6;
+  padding: 10px; background: transparent; color: #222; overflow-y: auto;
+}
+
+/* ── Splitter ──────────────────────────────────────────── */
+#splitter {
+  width: 5px; cursor: col-resize; background: #c8c0b4; flex-shrink: 0;
+  transition: background .15s;
+}
+#splitter:hover { background: #8a7a6a; }
+
+/* ── Preview pane ──────────────────────────────────────── */
+#preview-pane { flex: 1; overflow-y: auto; padding: 24px 32px 40px; background: #fff; }
+#preview-content { max-width: 860px; }
+
+/* ── Rendered song styles (original jwebchord.css classes) ── */
+/* Defaults — overridden at runtime by the dynamic-css <style> block */
+#preview-content h1 { font-family: "Arial", Helvetica; font-size: 32pt; }
+#preview-content h2 { font-family: "Arial", Helvetica; font-size: 16pt; }
+
+.lyrics, .lyrics_chorus { font-size: 14pt; font-family: "Times New Roman", serif; }
+.lyrics_tab, .lyrics_chorus_tab { font-family: "Courier New", Courier; font-size: 14pt; }
+.lyrics_chorus, .lyrics_chorus_tab, .chords_chorus, .chords_chorus_tab { font-weight: bold; }
+.chords, .chords_chorus, .chords_tab, .chords_chorus_tab {
+  font-size: 14pt; color: green; padding-right: 4pt; vertical-align: bottom;
+}
+.comment, .comment_italic, .comment_box { background-color: #ffbbaa; font-weight: normal; }
+.comment_italic { font-style: italic; }
+.comment_box { border: solid; }
+
+/* Song table layout */
+#preview-content table { border-collapse: collapse; }
+#preview-content td { padding: 0; white-space: nowrap; }
+
+/* ── Modals ────────────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 300;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.visible { display: flex; }
+.modal-box {
+  background: #f0ece4; border: 1px solid #a09880;
+  box-shadow: 3px 4px 14px rgba(0,0,0,.3);
+  min-width: 300px; max-width: 90vw; max-height: 90vh;
+  overflow-y: auto; display: flex; flex-direction: column;
+}
+.modal-header {
+  padding: 8px 14px; background: #ddd8cc; border-bottom: 1px solid #c8c0b4;
+  font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;
+}
+.modal-close { cursor: pointer; font-size: 16px; line-height: 1; color: #666; }
+.modal-close:hover { color: #000; }
+.modal-body { padding: 16px; }
+.modal-footer { padding: 8px 14px; border-top: 1px solid #c8c0b4; display: flex; justify-content: flex-end; gap: 8px; }
+.modal-btn {
+  font-size: 12px; padding: 4px 16px; cursor: pointer;
+  border: 1px solid #a09880; background: #e8e4dc;
+  font-family: "Times New Roman", serif; border-radius: 2px;
+}
+.modal-btn:hover { background: #d0c8bc; }
+.modal-btn.primary { background: #4a90d9; color: #fff; border-color: #3070b9; }
+.modal-btn.primary:hover { background: #3070b9; }
+
+/* ── Settings grid ─────────────────────────────────────── */
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; }
+.settings-col { display: flex; flex-direction: column; gap: 8px; }
+.settings-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.settings-row label { min-width: 140px; text-align: right; color: #444; }
+.settings-row input[type=text] {
+  width: 90px; font-size: 12px; padding: 2px 6px;
+  border: 1px solid #b0a898; background: #fff;
+  font-family: "Times New Roman", serif;
+}
+.settings-row select {
+  font-size: 12px; padding: 2px 4px;
+  border: 1px solid #b0a898; background: #fff;
+  font-family: "Times New Roman", serif;
+}
+
+/* ── Transpose picker ──────────────────────────────────── */
+.transpose-list {
+  list-style: none; border: 1px solid #b0a898; background: #fff;
+  max-height: 160px; overflow-y: auto; width: 180px;
+}
+.transpose-list li { padding: 5px 12px; font-size: 12px; cursor: pointer; }
+.transpose-list li:hover { background: #4a90d9; color: #fff; }
+.transpose-list li.selected { background: #c8d8f0; }
+
+/* ── Help table ────────────────────────────────────────── */
+#help-table { border-collapse: collapse; font-size: 12px; }
+#help-table th, #help-table td { border: 1px solid #aaa; padding: 5px 10px; vertical-align: top; }
+#help-table th { background: #ddd8cc; }
+#help-table pre { margin: 0; font-size: 11px; }
+
+/* ── Status bar ────────────────────────────────────────── */
+#statusbar {
+  padding: 3px 12px; font-size: 11px; color: #666;
+  background: #e8e4dc; border-top: 1px solid #c8c0b4;
+}
+
+/* ── Print ─────────────────────────────────────────────── */
+@media print {
+  #menubar, #toolbar, #editor-pane, #splitter, #statusbar { display: none !important; }
+  #main { display: block; }
+  #preview-pane { padding: 0; overflow: visible; }
+}

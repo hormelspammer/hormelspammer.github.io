@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JWebChord</title>
+<link rel="stylesheet" href="jwebchord.css">
+</head>
+<body>
+
+<!-- Dynamic CSS slot — overwritten by Settings -->
+<style id="dynamic-css"></style>
+
+<!-- ══════════════ MENU BAR ══════════════ -->
+<div id="menubar">
+  <div class="menu-brand">♩ JWebChord</div>
+  <div class="menu-item">
+    <div class="menu-title" onclick="toggleMenu('file-dropdown')">File</div>
+    <div class="menu-dropdown" id="file-dropdown">
+      <div class="menu-entry" onclick="openEditorModal()">Editor</div>
+      <div class="menu-entry" onclick="openTransposeModal()">Set Transpose Level (Do before Convert)</div>
+      <div class="menu-entry" onclick="convertSong()">Convert Song</div>
+      <hr class="menu-sep">
+      <div class="menu-entry" onclick="openSettingsModal()">Settings</div>
+      <div class="menu-entry" onclick="openHelpModal()">Help</div>
+      <hr class="menu-sep">
+      <div class="menu-entry" onclick="openAboutModal()">About/Credits</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TOOLBAR ══════════════ -->
+<div id="toolbar">
+  <span class="tb-label">Convert:</span>
+  <button class="tb-btn" onclick="convertSong()">▶ Convert Song</button>
+  <div class="tb-sep"></div>
+  <span class="tb-label">Transpose:</span>
+  <button class="tb-btn" onclick="shiftTranspose(-1)">− 1</button>
+  <span id="transpose-display">+0 Half Steps</span>
+  <button class="tb-btn" onclick="shiftTranspose(+1)">+ 1</button>
+  <button class="tb-btn" onclick="resetTranspose()">Reset</button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="chords-btn"  onclick="toggleChords()">Hide Chords</button>
+  <button class="tb-btn" id="cols-btn"    onclick="toggleColumns()">2 Columns</button>
+  <div class="tb-sep"></div>
+  <span class="tb-label">Open file:</span>
+  <label class="tb-btn" style="cursor:pointer">
+    Browse…
+    <input type="file" id="file-input" accept=".cho,.chopro,.chordpro,.txt"
+           style="display:none" onchange="loadFile(event)">
+  </label>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" onclick="exportHtml()">Export HTML</button>
+  <button class="tb-btn" onclick="window.print()">Print</button>
+</div>
+
+<!-- ══════════════ MAIN AREA ══════════════ -->
+<div id="main">
+
+  <!-- Editor pane -->
+  <div id="editor-pane">
+    <div id="editor-pane-header">
+      <span>ChordPro source</span>
+      <label title="Open .cho / .chopro file">Open file ▲
+        <input type="file" accept=".cho,.chopro,.chordpro,.txt"
+               style="display:none" onchange="loadFile(event)">
+      </label>
+    </div>
+    <textarea id="source-editor" spellcheck="false"
+              placeholder="Paste ChordPro source here and click Convert Song…
+
+Original format (value after closing brace):
+{title:} My Song Title
+{subtitle:} Artist Name
+{comment:} Verse 1
+[G]Amazing [D]grace how [Em]sweet the [C]sound
+
+Also supported (value inside braces):
+{title: My Song Title}
+{key: G}
+
+{start_of_chorus}
+[C]Bold [G]chorus [D]line
+{end_of_chorus}
+
+# Lines starting with # are comments (hidden)"></textarea>
+  </div>
+
+  <!-- Splitter -->
+  <div id="splitter"></div>
+
+  <!-- Preview pane -->
+  <div id="preview-pane">
+    <div id="preview-content">
+      <p style="color:#aaa; font-style:italic; font-size:13px; margin-top:40px; text-align:center;">
+        Open or paste a ChordPro file, then click <strong>Convert Song</strong>.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════ STATUS BAR ══════════════ -->
+<div id="statusbar">Ready.</div>
+
+<!-- ══════════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════════════ -->
+
+<!-- Transpose modal -->
+<div class="modal-overlay" id="modal-transpose">
+  <div class="modal-box" style="width:220px">
+    <div class="modal-header">Set Transpose Level
+      <span class="modal-close" onclick="closeModal('modal-transpose')">✕</span>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px; margin-bottom:8px;">Select transpose level:</p>
+      <ul class="transpose-list" id="transpose-list"></ul>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn primary" onclick="applyTranspose()">Apply</button>
+      <button class="modal-btn" onclick="closeModal('modal-transpose')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-header">Settings
+      <span class="modal-close" onclick="closeModal('modal-settings')">✕</span>
+    </div>
+    <div class="modal-body">
+      <div class="settings-grid">
+        <div class="settings-col">
+          <div class="settings-row"><label>H1 font size (pt):</label>
+            <input type="text" id="s-h1-size"></div>
+          <div class="settings-row"><label>H2 font size (pt):</label>
+            <input type="text" id="s-h2-size"></div>
+          <div class="settings-row"><label>Lyric font size (pt):</label>
+            <input type="text" id="s-lyric-size"></div>
+          <div class="settings-row"><label>Tab font size (pt):</label>
+            <input type="text" id="s-tab-size"></div>
+          <div class="settings-row"><label>Chord font size (pt):</label>
+            <input type="text" id="s-chord-size"></div>
+        </div>
+        <div class="settings-col">
+          <div class="settings-row">
+            <label>Chord color:</label>
+            <input type="text"  id="s-chord-color">
+            <input type="color" id="s-chord-color-picker"
+                   style="width:28px;height:24px;padding:1px;border:1px solid #aaa;cursor:pointer">
+          </div>
+          <div class="settings-row"><label>Chord font weight:</label>
+            <select id="s-chord-weight">
+              <option value="normal">normal</option>
+              <option value="bold">bold</option>
+            </select>
+          </div>
+          <div class="settings-row"><label>Chorus font weight:</label>
+            <select id="s-chorus-weight">
+              <option value="normal">normal</option>
+              <option value="bold">bold</option>
+            </select>
+          </div>
+          <div class="settings-row"><label>Comment font weight:</label>
+            <select id="s-comment-weight">
+              <option value="normal">normal</option>
+              <option value="bold">bold</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label>Comment background:</label>
+            <input type="text"  id="s-comment-bgcolor">
+            <input type="color" id="s-comment-color-picker"
+                   style="width:28px;height:24px;padding:1px;border:1px solid #aaa;cursor:pointer">
+          </div>
+          <div class="settings-row"><label>Font style:</label>
+            <select id="s-font-style">
+              <option value="0">Arial</option>
+              <option value="1">Courier New</option>
+              <option value="2">Times New Roman</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn primary" onclick="saveSettings()">Save</button>
+      <button class="modal-btn" onclick="closeModal('modal-settings')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Editor modal -->
+<div class="modal-overlay" id="modal-editor">
+  <div class="modal-box" style="width:700px; max-height:80vh">
+    <div class="modal-header">Editor
+      <span class="modal-close" onclick="closeModal('modal-editor')">✕</span>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <textarea id="modal-editor-text"
+        style="width:100%; height:380px; font-family:'Courier New',monospace; font-size:12px;
+               line-height:1.6; border:none; outline:none; padding:12px;
+               resize:vertical; background:#fff;"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn primary" onclick="applyEditorText()">Apply to Source</button>
+      <button class="modal-btn" onclick="closeModal('modal-editor')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Help modal -->
+<div class="modal-overlay" id="modal-help">
+  <div class="modal-box" style="width:760px">
+    <div class="modal-header">Help
+      <span class="modal-close" onclick="closeModal('modal-help')">✕</span>
+    </div>
+    <div class="modal-body">
+      <table id="help-table" width="100%">
+        <colgroup><col style="width:230px"><col style="width:190px"><col></colgroup>
+        <tr><th>Command</th><th>Description</th><th>Note</th></tr>
+        <tr><td><pre>{title:} Song Title&#10;{t:} Song Title&#10;— or —&#10;{title: Song Title}</pre></td>
+            <td>Song Title</td><td>Displayed using Heading 1</td></tr>
+        <tr><td><pre>{subtitle:} Artist&#10;{st:} Artist&#10;— or —&#10;{subtitle: Artist}</pre></td>
+            <td>Subtitle</td><td>Usually composer or artist. Displayed using Heading 2.</td></tr>
+        <tr><td><pre>{comment:} text&#10;{c:} text</pre></td>
+            <td>Comment</td><td>e.g. "Chorus". Comments have a colored background.</td></tr>
+        <tr><td><pre>{comment_italic:} text&#10;{ci:} text</pre></td>
+            <td>Italic comment</td><td>Written in italics. Colored background.</td></tr>
+        <tr><td><pre>{comment_box:} text&#10;{cb:} text</pre></td>
+            <td>Comment box</td><td>Colored background with border.</td></tr>
+        <tr><td><pre>{start_of_chorus}&#10;{soc}</pre></td>
+            <td>Start of chorus</td><td>Displayed using bold font</td></tr>
+        <tr><td><pre>{end_of_chorus}&#10;{eoc}</pre></td>
+            <td>End of chorus</td><td>Displayed using bold font</td></tr>
+        <tr><td><pre>{start_of_tab}&#10;{sot}</pre></td>
+            <td>Start of tab</td><td>Fixed-width font is used</td></tr>
+        <tr><td><pre>{end_of_tab}&#10;{eot}</pre></td>
+            <td>End of tab</td><td>Fixed-width font is used</td></tr>
+        <tr><td><pre>[Chord]lyric</pre></td>
+            <td>Inline chord</td>
+            <td>Chord name in square brackets, immediately followed by the lyric syllable</td></tr>
+        <tr><td><pre># comment</pre></td>
+            <td>Comment line</td><td>Lines starting with # are hidden (HTML comment)</td></tr>
+        <tr><td><pre>{key: G}</pre></td>
+            <td>Song key</td><td>Displayed in the header.</td></tr>
+        <tr><td><pre>{capo: 2}</pre></td>
+            <td>Capo position</td><td>Displayed in the header.</td></tr>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="closeModal('modal-help')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- About modal -->
+<div class="modal-overlay" id="modal-about">
+  <div class="modal-box" style="width:300px">
+    <div class="modal-header">About / Credits
+      <span class="modal-close" onclick="closeModal('modal-about')">✕</span>
+    </div>
+    <div class="modal-body" style="text-align:center; line-height:1.8; font-size:13px">
+      <p>Written by: Brian K Wigal</p>
+      <p>Based on the WebChord project:<br>
+        <a href="http://sourceforge.net/projects/webchord/" target="_blank"
+           style="color:#4a7ab0">sourceforge.net/projects/webchord/</a>
+      </p>
+      <p>Version: 1.0.0.0</p>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="closeModal('modal-about')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export modal -->
+<div class="modal-overlay" id="modal-export">
+  <div class="modal-box" style="width:340px">
+    <div class="modal-header">Export HTML
+      <span class="modal-close" onclick="closeModal('modal-export')">✕</span>
+    </div>
+    <div class="modal-body" style="font-size:13px">
+      <p>The rendered HTML is ready to download as <strong>song.html</strong>.</p>
+    </div>
+    <div class="modal-footer">
+      <a id="export-link" class="modal-btn primary" download="song.html">Download song.html</a>
+      <button class="modal-btn" onclick="closeModal('modal-export')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="jwebchord.js"></script>
+</body>
+</html>
