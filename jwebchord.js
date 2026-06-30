@@ -251,6 +251,7 @@ function parseDirective(songLine) {
 function processLine(songLine, htmlParts) {
     chordArray = [];
     lyricArray = [];
+    var chordOnly = [];   // parallel flag: true when the lyric cell has no real text
 
     var wordSB = "";
     var i = 0;
@@ -268,7 +269,7 @@ function processLine(songLine, htmlParts) {
         wordSB = "";
 
         if (checkWord.length === 0 && songLine.length === 0) {
-            lyricArray = []; chordArray = [];
+            lyricArray = []; chordArray = []; chordOnly = [];
         } else if (checkWord.indexOf("[") !== -1) {
             var startChord = checkWord.indexOf("[");
             var endChord   = checkWord.indexOf("]");
@@ -283,22 +284,29 @@ function processLine(songLine, htmlParts) {
 
             if (checkWord.startsWith("[")) {
                 chordArray.push(checkWord.substring(startChord + 1, endChord));
-                // Lyric text after the closing bracket, plus a trailing space.
-                // If there is no lyric text (chord-only word), use a single
-                // space so that consecutive chord columns stay visually
-                // separated regardless of the chord widths above them.
                 var lyricAfter = checkWord.substring(endChord + 1);
-                lyricArray.push(lyricAfter.length > 0 ? lyricAfter + "\u00a0" : "\u0020");
+                if (lyricAfter.length > 0) {
+                    lyricArray.push(lyricAfter + "\u00a0");
+                    chordOnly.push(false);
+                } else {
+                    // Chord-only word — lyric cell needs padding so consecutive
+                    // chord columns don't run together.
+                    lyricArray.push("\u00a0");
+                    chordOnly.push(true);
+                }
             } else {
                 lyricArray.push(checkWord.substring(0, startChord));
                 lyricArray.push(checkWord.substring(endChord + 1) + "\u00a0");
                 chordArray.push("\u00a0");
                 chordArray.push(checkWord.substring(startChord + 1, endChord));
+                chordOnly.push(false);
+                chordOnly.push(false);
             }
         } else {
             if (checkWord.length > 0) {
                 lyricArray.push(checkWord + "\u00a0");
                 chordArray.push("\u00a0");
+                chordOnly.push(false);
             }
         }
     }
@@ -317,12 +325,15 @@ function processLine(songLine, htmlParts) {
         }
         htmlParts.push("</tr>\n<tr>\n");
         for (var j = 0; j < lyricArray.length; j++) {
-            htmlParts.push("<td class='" + lyricMode[mode] + "'>" + esc(lyricArray[j]) + "</td>\n");
+            // Add padding-right on chord-only cells so consecutive chords
+            // always have a visible gap between them.
+            var tdStyle = chordOnly[j] ? " style='padding-right:0.5em'" : "";
+            htmlParts.push("<td class='" + lyricMode[mode] + "'" + tdStyle + ">" + esc(lyricArray[j]) + "</td>\n");
         }
         htmlParts.push("</tr></table>\n");
     }
 
-    chordArray = []; lyricArray = [];
+    chordArray = []; lyricArray = []; chordOnly = [];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
