@@ -108,7 +108,9 @@ body { display: flex; flex-direction: column; }
 
 /* Song table layout */
 #preview-content table { border-collapse: collapse; }
-#preview-content td { padding: 0; white-space: nowrap; }
+#preview-content td { padding-top: 0; padding-bottom: 0; padding-left: 0; white-space: nowrap; }
+/* padding-right is intentionally omitted so that inline padding-right:0.5em
+   on chord-only lyric cells takes effect and keeps consecutive chords apart. */
 
 /* ── Modals ────────────────────────────────────────────── */
 .modal-overlay {
