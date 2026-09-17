@@ -642,6 +642,10 @@ function setStatus(msg) {
     var editorPane = document.getElementById("editor-pane");
     var dragging = false, startX = 0, startW = 0;
 
+    // Restore last-used width
+    var savedWidth = localStorage.getItem("jwebchord_editor_width");
+    if (savedWidth) editorPane.style.width = savedWidth + "px";
+
     splitter.addEventListener("mousedown", function (e) {
         dragging = true; startX = e.clientX; startW = editorPane.offsetWidth;
         document.body.style.cursor     = "col-resize";
@@ -649,16 +653,40 @@ function setStatus(msg) {
     });
     document.addEventListener("mousemove", function (e) {
         if (!dragging) return;
-        editorPane.style.width = Math.max(180, Math.min(600, startW + (e.clientX - startX))) + "px";
+        var maxW = Math.floor(window.innerWidth * 0.80);
+        var w    = Math.max(180, Math.min(maxW, startW + (e.clientX - startX)));
+        editorPane.style.width = w + "px";
     });
     document.addEventListener("mouseup", function () {
         if (dragging) {
             dragging = false;
             document.body.style.cursor     = "";
             document.body.style.userSelect = "";
+            // Persist the chosen width
+            try { localStorage.setItem("jwebchord_editor_width", editorPane.offsetWidth); } catch (e) {}
         }
     });
 }());
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOURCE AUTO-SAVE
+// Saves the editor content to localStorage 1 second after the user stops
+// typing.  On startup, the saved content is restored instead of the sample.
+// ─────────────────────────────────────────────────────────────────────────────
+var SOURCE_KEY  = "jwebchord_source";
+var saveTimer   = null;
+
+function saveSource() {
+    try {
+        localStorage.setItem(SOURCE_KEY, document.getElementById("source-editor").value);
+        setStatus("Source saved.");
+    } catch (e) {}
+}
+
+document.getElementById("source-editor").addEventListener("input", function () {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveSource, 1000);
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INIT
@@ -666,7 +694,11 @@ function setStatus(msg) {
 loadSettings();
 updateTransposeDisplay();
 
-document.getElementById("source-editor").value = [
+// Restore last saved source, or fall back to the built-in sample
+var savedSource = null;
+try { savedSource = localStorage.getItem(SOURCE_KEY); } catch (e) {}
+
+document.getElementById("source-editor").value = savedSource || [
     "{title:} Amazing Grace",
     "{subtitle:} Traditional Hymn",
     "{key:} G",

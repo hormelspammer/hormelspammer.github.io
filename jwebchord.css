@@ -62,7 +62,7 @@ body { display: flex; flex-direction: column; }
 
 /* ── Editor pane ───────────────────────────────────────── */
 #editor-pane {
-  width: 340px; min-width: 220px; max-width: 520px;
+  width: 340px; min-width: 220px;
   display: flex; flex-direction: column;
   background: #faf8f3; border-right: 1px solid #c8c0b4;
 }
