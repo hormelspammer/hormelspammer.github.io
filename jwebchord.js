@@ -605,6 +605,32 @@ function loadFile(evt) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// SAVE SONG  — downloads the ChordPro source as a .cho file
+// ─────────────────────────────────────────────────────────────────────────────
+function saveSong() {
+    var source = document.getElementById("source-editor").value;
+    if (!source.trim()) { setStatus("Nothing to save."); return; }
+
+    // Try to extract the song title to use as the filename
+    var filename = "song.txt";
+    var titleMatch = source.match(/\{t(?:itle)?:\}\s*(.+)/im)      // {title:} My Song
+                  || source.match(/\{t(?:itle)?:\s*([^}]+)\}/im);  // {title: My Song}
+    if (titleMatch && titleMatch[1].trim()) {
+        // Strip characters that are illegal in filenames
+        filename = titleMatch[1].trim().replace(/[\\/:*?"<>|]/g, "_") + ".txt";
+    }
+
+    var blob = new Blob([source], { type: "text/plain" });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement("a");
+    a.href     = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    setStatus("Saved: " + filename);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // EXPORT HTML
 // ─────────────────────────────────────────────────────────────────────────────
 function exportHtml() {
@@ -679,7 +705,7 @@ var saveTimer   = null;
 function saveSource() {
     try {
         localStorage.setItem(SOURCE_KEY, document.getElementById("source-editor").value);
-        setStatus("Source saved.");
+        setStatus("Draft auto-saved in browser. Use Save Song to save to a file.");
     } catch (e) {}
 }
 
