@@ -605,29 +605,54 @@ function loadFile(evt) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SAVE SONG  — downloads the ChordPro source as a .cho file
+// SAVE SONG  — opens a Save As dialog (Chrome/Edge) or triggers a download
 // ─────────────────────────────────────────────────────────────────────────────
-function saveSong() {
+async function saveSong() {
     var source = document.getElementById("source-editor").value;
     if (!source.trim()) { setStatus("Nothing to save."); return; }
 
-    // Try to extract the song title to use as the filename
-    var filename = "song.txt";
+    // Derive a suggested filename from the {title:} directive
+    var suggestedName = "song.txt";
     var titleMatch = source.match(/\{t(?:itle)?:\}\s*(.+)/im)      // {title:} My Song
                   || source.match(/\{t(?:itle)?:\s*([^}]+)\}/im);  // {title: My Song}
     if (titleMatch && titleMatch[1].trim()) {
-        // Strip characters that are illegal in filenames
-        filename = titleMatch[1].trim().replace(/[\\/:*?"<>|]/g, "_") + ".txt";
+        suggestedName = titleMatch[1].trim().replace(/[\\/:*?"<>|]/g, "_") + ".txt";
     }
 
+    // Use the File System Access API when available (Chrome / Edge on Windows/Mac).
+    // This opens a proper OS "Save As" dialog so the user can choose the folder
+    // and filename, and saves directly to that location.
+    if (window.showSaveFilePicker) {
+        try {
+            var handle = await window.showSaveFilePicker({
+                suggestedName: suggestedName,
+                types: [{
+                    description: "Text / ChordPro files",
+                    accept: { "text/plain": [".txt", ".cho", ".chopro"] }
+                }]
+            });
+            var writable = await handle.createWritable();
+            await writable.write(source);
+            await writable.close();
+            setStatus("Saved: " + handle.name);
+            return;
+        } catch (e) {
+            // User cancelled the dialog — do nothing
+            if (e.name === "AbortError") { setStatus("Save cancelled."); return; }
+            // Any other error — fall through to the download fallback below
+        }
+    }
+
+    // Fallback for Firefox and other browsers that don't support showSaveFilePicker.
+    // Triggers a browser download; the file lands in the browser's Downloads folder.
     var blob = new Blob([source], { type: "text/plain" });
     var url  = URL.createObjectURL(blob);
     var a    = document.createElement("a");
     a.href     = url;
-    a.download = filename;
+    a.download = suggestedName;
     a.click();
     URL.revokeObjectURL(url);
-    setStatus("Saved: " + filename);
+    setStatus("Saved: " + suggestedName);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

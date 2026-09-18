@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JWebChord</title>
-<link rel="stylesheet" href="jwebchord.css?v=2">
+<link rel="stylesheet" href="jwebchord.css?v=1.0.0.6">
 </head>
 <body>
 
@@ -62,10 +62,6 @@
   <div id="editor-pane">
     <div id="editor-pane-header">
       <span>ChordPro source</span>
-      <label title="Open .cho / .chopro file">Open file ▲
-        <input type="file" accept=".cho,.chopro,.chordpro,.txt"
-               style="display:none" onchange="loadFile(event)">
-      </label>
     </div>
     <textarea id="source-editor" spellcheck="false"
               placeholder="Paste ChordPro source here and click Convert Song…
@@ -269,7 +265,7 @@ Also supported (value inside braces):
         <a href="http://sourceforge.net/projects/webchord/" target="_blank"
            style="color:#4a7ab0">sourceforge.net/projects/webchord/</a>
       </p>
-      <p>Version: 1.0.0.5</p>
+      <p>Version: 1.0.0.6</p>
     </div>
     <div class="modal-footer">
       <button class="modal-btn" onclick="closeModal('modal-about')">Close</button>
@@ -293,6 +289,6 @@ Also supported (value inside braces):
   </div>
 </div>
 
-<script src="jwebchord.js?v=2"></script>
+<script src="jwebchord.js?v=1.0.0.6"></script>
 </body>
 </html>
