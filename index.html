@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JWebChord</title>
-<link rel="stylesheet" href="jwebchord.css?v=1.0.0.6">
+<link rel="stylesheet" href="jwebchord.css?v=1.0.0.7">
 </head>
 <body>
 
@@ -49,9 +49,10 @@
     <input type="file" id="file-input" accept=".cho,.chopro,.chordpro,.txt"
            style="display:none" onchange="loadFile(event)">
   </label>
+  <span class="tb-label">Save file:</span>
+  <button class="tb-btn" onclick="saveSong()">Save</button>
   <div class="tb-sep"></div>
   <button class="tb-btn" onclick="exportHtml()">Export HTML</button>
-  <button class="tb-btn" onclick="saveSong()">Save Song</button>
   <button class="tb-btn" onclick="window.print()">Print</button>
 </div>
 
@@ -232,6 +233,10 @@ Also supported (value inside braces):
             <td>Start of chorus</td><td>Displayed using bold font</td></tr>
         <tr><td><pre>{end_of_chorus}&#10;{eoc}</pre></td>
             <td>End of chorus</td><td>Displayed using bold font</td></tr>
+        <tr><td><pre>{start_of_bridge}&#10;{sob}</pre></td>
+            <td>Start of bridge</td><td>Displayed using italic font</td></tr>
+        <tr><td><pre>{end_of_bridge}&#10;{eob}</pre></td>
+            <td>End of bridge</td><td>Displayed using italic font</td></tr>
         <tr><td><pre>{start_of_tab}&#10;{sot}</pre></td>
             <td>Start of tab</td><td>Fixed-width font is used</td></tr>
         <tr><td><pre>{end_of_tab}&#10;{eot}</pre></td>
@@ -265,7 +270,7 @@ Also supported (value inside braces):
         <a href="http://sourceforge.net/projects/webchord/" target="_blank"
            style="color:#4a7ab0">sourceforge.net/projects/webchord/</a>
       </p>
-      <p>Version: 1.0.0.6</p>
+      <p>Version: 1.0.0.7</p>
     </div>
     <div class="modal-footer">
       <button class="modal-btn" onclick="closeModal('modal-about')">Close</button>
@@ -289,6 +294,6 @@ Also supported (value inside braces):
   </div>
 </div>
 
-<script src="jwebchord.js?v=1.0.0.6"></script>
+<script src="jwebchord.js?v=1.0.0.7"></script>
 </body>
 </html>

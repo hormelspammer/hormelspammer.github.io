@@ -34,10 +34,10 @@ var lastHtmlSB = "";   // last rendered HTML (for export)
 // ── Per-line chord/lyric accumulators ─────────────────────────────────────
 var chordArray = [];
 var lyricArray = [];
-var mode = 0;   // 0=verse  1=chorus  2=tab
+var mode = 0;   // 0=verse  1=chorus  2=tab  3=bridge
 
-var lyricMode = ["lyrics", "lyrics_chorus", "lyrics_tab", "lyrics_chorus_tab"];
-var chordMode = ["chords", "chords_chorus", "chords_tab", "chords_chorus_tab"];
+var lyricMode = ["lyrics", "lyrics_chorus", "lyrics_tab", "lyrics_chorus_tab", "lyrics_bridge"];
+var chordMode = ["chords", "chords_chorus", "chords_tab", "chords_chorus_tab", "chords_bridge"];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MENU
@@ -240,6 +240,8 @@ function parseDirective(songLine) {
     if (is(["end_of_chorus",  "eoc"]))   return { cmd: "eoc" };
     if (is(["start_of_tab",   "sot"]))   return { cmd: "sot" };
     if (is(["end_of_tab",     "eot"]))   return { cmd: "eot" };
+    if (is(["start_of_bridge","sob"]))   return { cmd: "sob" };
+    if (is(["end_of_bridge",  "eob"]))   return { cmd: "eob" };
     if (is(["new_song",       "ns"]))    return { cmd: "ns"  };
 
     return { cmd: "unsupported", raw: songLine };
@@ -396,6 +398,8 @@ function convertSong() {
                 case "eoc": mode = 0; break;
                 case "sot": mode = 2; break;
                 case "eot": mode = 0; break;
+                case "sob": mode = 3; break;
+                case "eob": mode = 0; break;
                 case "ns":  htmlParts.push("<hr>\n"); break;
                 case "comment":
                     htmlParts.push("<p class='comment'>" + esc(dir.value) + "</p>\n"); break;
@@ -450,6 +454,9 @@ function buildStandaloneHtml(bodyHtml, title) {
     sb += ".comment, .comment_italic, .comment_box { background-color:" + cfg.comment_bgcolor + "; font-weight:" + cfg.comment_weight + ";}\n";
     sb += ".comment_italic { font-style:italic; }\n";
     sb += ".comment_box { border:solid; }\n";
+    sb += ".lyrics_bridge, .chords_bridge { font-style:italic; }\n";
+    sb += ".lyrics_bridge { font-size:" + cfg.lyric_size + "pt; font-family:" + ff + "; }\n";
+    sb += ".chords_bridge { font-size:" + cfg.chord_size + "pt; font-weight:" + cfg.chord_weight + "; color:" + cfg.chord_color + "; padding-right:4pt; font-family:" + ff + "; }\n";
     sb += "--></style>\n";
     sb += "<title>" + esc(title || "") + "</title></head><body>\n";
     sb += bodyHtml;
@@ -471,7 +478,10 @@ function applyDynamicCSS() {
         ".chords, .chords_chorus, .chords_tab, .chords_chorus_tab { font-size:" + cfg.chord_size + "pt; font-weight:" + cfg.chord_weight + "; color:" + cfg.chord_color + "; padding-right:4pt; font-family:" + ff + "; }\n" +
         ".comment, .comment_italic, .comment_box { background-color:" + cfg.comment_bgcolor + "; font-weight:" + cfg.comment_weight + "; }\n" +
         ".comment_italic { font-style:italic; }\n" +
-        ".comment_box { border:solid; }\n";
+        ".comment_box { border:solid; }\n" +
+        ".lyrics_bridge, .chords_bridge { font-style:italic; }\n" +
+        ".lyrics_bridge { font-size:" + cfg.lyric_size + "pt; font-family:" + ff + "; }\n" +
+        ".chords_bridge { font-size:" + cfg.chord_size + "pt; font-weight:" + cfg.chord_weight + "; color:" + cfg.chord_color + "; padding-right:4pt; font-family:" + ff + "; }\n";
     document.getElementById("dynamic-css").textContent = css;
 }
 

@@ -105,6 +105,8 @@ body { display: flex; flex-direction: column; }
 .comment, .comment_italic, .comment_box { background-color: #ffbbaa; font-weight: normal; }
 .comment_italic { font-style: italic; }
 .comment_box { border: solid; }
+.lyrics_bridge, .chords_bridge { font-style: italic; }
+.chords_bridge { font-size: 14pt; color: green; padding-right: 4pt; vertical-align: bottom; }
 
 /* Song table layout */
 #preview-content table { border-collapse: collapse; }
