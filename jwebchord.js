@@ -37,8 +37,8 @@ var chordArray = [];
 var lyricArray = [];
 var mode = 0;   // 0=verse  1=chorus  2=tab  3=bridge
 
-var lyricMode = ["lyrics", "lyrics_chorus", "lyrics_tab", "lyrics_chorus_tab", "lyrics_bridge"];
-var chordMode = ["chords", "chords_chorus", "chords_tab", "chords_chorus_tab", "chords_bridge"];
+var lyricMode = ["lyrics", "lyrics_chorus", "lyrics_tab", "lyrics_bridge"];
+var chordMode = ["chords", "chords_chorus", "chords_tab", "chords_bridge"];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MENU
