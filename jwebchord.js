@@ -10,6 +10,7 @@ var cfg = {
     chord_weight:    "normal",
     chord_color:     "green",
     chorus_weight:   "bold",
+    bridge_weight:   "bold",
     comment_weight:  "normal",
     comment_bgcolor: "#ffbbaa",
     font_style:      "2"   // 0=Arial  1=Courier New  2=Times New Roman
@@ -454,7 +455,7 @@ function buildStandaloneHtml(bodyHtml, title) {
     sb += ".comment, .comment_italic, .comment_box { background-color:" + cfg.comment_bgcolor + "; font-weight:" + cfg.comment_weight + ";}\n";
     sb += ".comment_italic { font-style:italic; }\n";
     sb += ".comment_box { border:solid; }\n";
-    sb += ".lyrics_bridge, .chords_bridge { font-weight:" + cfg.chorus_weight + "; font-family:" + ff + "; }\n";
+    sb += ".lyrics_bridge, .chords_bridge { font-weight:" + cfg.bridge_weight + "; font-family:" + ff + "; }\n";
     sb += ".lyrics_bridge { font-size:" + cfg.lyric_size + "pt; font-style:italic; }\n";
     sb += ".chords_bridge { font-size:" + cfg.chord_size + "pt; color:" + cfg.chord_color + "; padding-right:4pt; }\n";
     sb += "--></style>\n";
@@ -479,7 +480,7 @@ function applyDynamicCSS() {
         ".comment, .comment_italic, .comment_box { background-color:" + cfg.comment_bgcolor + "; font-weight:" + cfg.comment_weight + "; }\n" +
         ".comment_italic { font-style:italic; }\n" +
         ".comment_box { border:solid; }\n" +
-        ".lyrics_bridge, .chords_bridge { font-weight:" + cfg.chorus_weight + "; font-family:" + ff + "; }\n" +
+        ".lyrics_bridge, .chords_bridge { font-weight:" + cfg.bridge_weight + "; font-family:" + ff + "; }\n" +
         ".lyrics_bridge { font-size:" + cfg.lyric_size + "pt; font-style:italic; }\n" +
         ".chords_bridge { font-size:" + cfg.chord_size + "pt; color:" + cfg.chord_color + "; padding-right:4pt; }\n";
     document.getElementById("dynamic-css").textContent = css;
@@ -496,6 +497,7 @@ function openSettingsModal() {
     document.getElementById("s-chord-size").value     = cfg.chord_size;
     document.getElementById("s-chord-weight").value   = cfg.chord_weight;
     document.getElementById("s-chorus-weight").value  = cfg.chorus_weight;
+    document.getElementById("s-bridge-weight").value  = cfg.bridge_weight;
     document.getElementById("s-comment-weight").value = cfg.comment_weight;
     document.getElementById("s-chord-color").value    = cfg.chord_color;
     document.getElementById("s-comment-bgcolor").value= cfg.comment_bgcolor;
@@ -542,6 +544,7 @@ function saveSettings() {
     cfg.chord_size      = document.getElementById("s-chord-size").value;
     cfg.chord_weight    = document.getElementById("s-chord-weight").value;
     cfg.chorus_weight   = document.getElementById("s-chorus-weight").value;
+    cfg.bridge_weight   = document.getElementById("s-bridge-weight").value;
     cfg.comment_weight  = document.getElementById("s-comment-weight").value;
     cfg.chord_color     = document.getElementById("s-chord-color").value;
     cfg.comment_bgcolor = document.getElementById("s-comment-bgcolor").value;
