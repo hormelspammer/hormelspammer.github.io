@@ -454,9 +454,9 @@ function buildStandaloneHtml(bodyHtml, title) {
     sb += ".comment, .comment_italic, .comment_box { background-color:" + cfg.comment_bgcolor + "; font-weight:" + cfg.comment_weight + ";}\n";
     sb += ".comment_italic { font-style:italic; }\n";
     sb += ".comment_box { border:solid; }\n";
-    sb += ".lyrics_bridge, .chords_bridge { font-style:italic; }\n";
-    sb += ".lyrics_bridge { font-size:" + cfg.lyric_size + "pt; font-family:" + ff + "; }\n";
-    sb += ".chords_bridge { font-size:" + cfg.chord_size + "pt; font-weight:" + cfg.chord_weight + "; color:" + cfg.chord_color + "; padding-right:4pt; font-family:" + ff + "; }\n";
+    sb += ".lyrics_bridge, .chords_bridge { font-weight:" + cfg.chorus_weight + "; font-family:" + ff + "; }\n";
+    sb += ".lyrics_bridge { font-size:" + cfg.lyric_size + "pt; font-style:italic; }\n";
+    sb += ".chords_bridge { font-size:" + cfg.chord_size + "pt; color:" + cfg.chord_color + "; padding-right:4pt; }\n";
     sb += "--></style>\n";
     sb += "<title>" + esc(title || "") + "</title></head><body>\n";
     sb += bodyHtml;
@@ -479,9 +479,9 @@ function applyDynamicCSS() {
         ".comment, .comment_italic, .comment_box { background-color:" + cfg.comment_bgcolor + "; font-weight:" + cfg.comment_weight + "; }\n" +
         ".comment_italic { font-style:italic; }\n" +
         ".comment_box { border:solid; }\n" +
-        ".lyrics_bridge, .chords_bridge { font-style:italic; }\n" +
-        ".lyrics_bridge { font-size:" + cfg.lyric_size + "pt; font-family:" + ff + "; }\n" +
-        ".chords_bridge { font-size:" + cfg.chord_size + "pt; font-weight:" + cfg.chord_weight + "; color:" + cfg.chord_color + "; padding-right:4pt; font-family:" + ff + "; }\n";
+        ".lyrics_bridge, .chords_bridge { font-weight:" + cfg.chorus_weight + "; font-family:" + ff + "; }\n" +
+        ".lyrics_bridge { font-size:" + cfg.lyric_size + "pt; font-style:italic; }\n" +
+        ".chords_bridge { font-size:" + cfg.chord_size + "pt; color:" + cfg.chord_color + "; padding-right:4pt; }\n";
     document.getElementById("dynamic-css").textContent = css;
 }
 
