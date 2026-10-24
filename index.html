@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JWebChord</title>
-<link rel="stylesheet" href="jwebchord.css?v=1.0.0.9">
+<link rel="stylesheet" href="jwebchord.css?v=1.0.0.11">
 </head>
 <body>
 
@@ -35,6 +35,10 @@
   <span id="transpose-display">+0 Half Steps</span>
   <button class="tb-btn" onclick="shiftTranspose(+1)">+ 1</button>
   <button class="tb-btn" onclick="resetTranspose()">Reset</button>
+  <label class="tb-label" style="cursor:pointer; display:flex; align-items:center; gap:4px;"
+         title="Also transpose chords written in comments (e.g. Intro: G D Em)">
+    <input type="checkbox" id="transpose-comments"> Transpose comments
+  </label>
   <div class="tb-sep"></div>
   <button class="tb-btn" id="chords-btn"  onclick="toggleChords()">Hide Chords</button>
   <button class="tb-btn" id="cols-btn"    onclick="toggleColumns()">2 Columns</button>
@@ -274,7 +278,7 @@ Also supported (value inside braces):
         <a href="http://sourceforge.net/projects/webchord/" target="_blank"
            style="color:#4a7ab0">sourceforge.net/projects/webchord/</a>
       </p>
-      <p>Version: 1.0.0.9</p>
+      <p>Version: 1.0.0.11</p>
     </div>
     <div class="modal-footer">
       <button class="modal-btn" onclick="closeModal('modal-about')">Close</button>
@@ -298,6 +302,6 @@ Also supported (value inside braces):
   </div>
 </div>
 
-<script src="jwebchord.js?v=1.0.0.9"></script>
+<script src="jwebchord.js?v=1.0.0.11"></script>
 </body>
 </html>

@@ -343,6 +343,59 @@ function processLine(songLine, htmlParts) {
 // ─────────────────────────────────────────────────────────────────────────────
 // CONVERT SONG
 // ─────────────────────────────────────────────────────────────────────────────
+// Matches things that look like chords (G, Bb7, F#m7, Cmaj7, Dsus4, G/B ...)
+// but not ordinary words that happen to start with A-G, such as [Bridge].
+var CHORD_RE = /^[A-G][#b]?(?:maj|min|dim|aug|sus|add|m|M|\+)?[0-9#b()+\-]*(?:sus[0-9]*|add[0-9]*)?(?:\/[A-G][#b]?)?$/;
+
+/**
+ * Transposes plain-text chords inside comment text, e.g. "Intro: G D Em"
+ * or "G-C-D".  Bracketed chords such as "[G]" are handled too.
+ * Only applies when the "Transpose comments" checkbox is ticked and a
+ * transpose level is selected.
+ *
+ * Each whitespace-separated word is checked against CHORD_RE, so ordinary
+ * words (Intro, Bridge, Chorus, Break ...) are left alone.  The one real
+ * ambiguity is the article "A": it is skipped when it starts the comment
+ * (or follows a colon / sentence end) and the next word is lowercase,
+ * as in "A tempo" or "Intro: A short break".
+ */
+function transposeCommentText(text) {
+    var box = document.getElementById("transpose-comments");
+    if (!box || !box.checked || getTransposeSelection() === 0) return text;
+
+    return text.replace(/[^\s,;|]+/g, function (tok, offset, whole) {
+        // Peel off surrounding punctuation:  ([G]),  "Em"  etc.
+        var m    = tok.match(/^([(\[{"']*)(.*?)([)\]}"'.,:;!?]*)$/);
+        var lead = m[1], core = m[2], trail = m[3];
+        if (!core) return tok;
+
+        // Article "A" check
+        if (core === "A") {
+            var before = whole.slice(0, offset).trim();
+            var after  = whole.slice(offset + tok.length).trim();
+            var startsClause = before === "" || /[.!?:]$/.test(before);
+            if (startsClause && /^[a-z]/.test(after)) return tok;
+        }
+
+        // Whole word is a chord:  G, Bb7, F#m7, G/B ...
+        if (CHORD_RE.test(core)) return lead + transposeChord(core) + trail;
+
+        // Hyphenated progression:  G-C-D
+        if (/[-\u2013\u2014]/.test(core)) {
+            var parts = core.split(/([-\u2013\u2014])/);   // keeps the dashes
+            var ok = parts.every(function (p, i) {
+                return i % 2 === 1 || CHORD_RE.test(p);
+            });
+            if (ok) {
+                return lead + parts.map(function (p, i) {
+                    return i % 2 === 1 ? p : transposeChord(p);
+                }).join("") + trail;
+            }
+        }
+        return tok;
+    });
+}
+
 function convertSong() {
     var source = document.getElementById("source-editor").value;
     if (!source.trim()) {
@@ -404,11 +457,11 @@ function convertSong() {
                 case "eob": mode = 0; break;
                 case "ns":  htmlParts.push("<hr>\n"); break;
                 case "comment":
-                    htmlParts.push("<p class='comment'>" + esc(dir.value) + "</p>\n"); break;
+                    htmlParts.push("<p class='comment'>" + esc(transposeCommentText(dir.value)) + "</p>\n"); break;
                 case "comment_italic":
-                    htmlParts.push("<p class='comment_italic'>" + esc(dir.value) + "</p>\n"); break;
+                    htmlParts.push("<p class='comment_italic'>" + esc(transposeCommentText(dir.value)) + "</p>\n"); break;
                 case "comment_box":
-                    htmlParts.push("<p class='comment_box'>" + esc(dir.value) + "</p>\n"); break;
+                    htmlParts.push("<p class='comment_box'>" + esc(transposeCommentText(dir.value)) + "</p>\n"); break;
                 case "unsupported":
                     htmlParts.push("<!--Unsupported command: " + dir.raw + "-->\n"); break;
             }
